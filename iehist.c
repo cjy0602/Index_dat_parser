@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+//setlocale(LC_ALL, "korean");
+
 const int TYPE_URL  = 0x01;
 const int TYPE_REDR = 0x02;
 
@@ -32,11 +34,25 @@ const int URL_URL_OFFSET  = 104;  // 0x68 Next, we see that the actual URL the u
 const int URL_TIME_OFFSET = 16;  // Last accessed Time Stamp
 const int REDR_URL_OFFSET = 16;  
 
+const int Download_URL_OFFSET = 468; // 0x1D4;
+
 struct history {
 	int nType;
 	char *pURL;
 	SYSTEMTIME st;
+	//SYSTEMTIME st2;
 };
+
+// IEHistoryDownload - index.dat Parsing Struct 
+struct history_download {
+	int nType;
+	char *pURL;
+	SYSTEMTIME st;
+	WCHAR *pReferer;
+	WCHAR *pDownloadURL;
+	WCHAR *pLocation;
+};
+
 
 int bMatchPattern( char *pBuf ) {
 
@@ -54,6 +70,108 @@ int bMatchPattern( char *pBuf ) {
 
 	return 0;
 
+}
+
+struct history_download *getDownload( char *pBuf, int nType ) {
+
+	int i = 0;
+	int j = 0;
+	int k = 0;
+	int l = 0;
+
+	struct history_download *pDownlaod;
+	FILETIME ft;
+
+	if ( nType == TYPE_URL ) {
+
+		pDownlaod = (struct history_download*) malloc ( sizeof( struct history_download ) );
+
+		// Last accessed Time Stamp 구조체에 저장.
+		memcpy( (DWORD *)&ft.dwLowDateTime, pBuf + URL_TIME_OFFSET, sizeof( DWORD ) );
+		memcpy( (DWORD *)&ft.dwHighDateTime, pBuf + URL_TIME_OFFSET + 4, sizeof( DWORD ) );
+		                                 
+		FileTimeToSystemTime( &ft, &pDownlaod->st );
+		pDownlaod->nType = TYPE_URL;
+
+		pBuf += URL_URL_OFFSET;
+
+	}
+	// REDR 속성 파일 일단 no-Touch
+	else if ( nType == TYPE_REDR ) {
+		pDownlaod = (struct history_download*) malloc ( sizeof( struct history_download ) );
+		ft.dwHighDateTime = 0;
+		ft.dwLowDateTime = 0;
+		FileTimeToSystemTime( &ft, &pDownlaod->st );
+		pDownlaod->nType = TYPE_REDR;
+		pBuf += REDR_URL_OFFSET;
+	}
+
+	else {
+		return NULL;
+	}
+
+	// ------------ GUID Value Parsing Start
+	// 현재 위치 (실제 URL이 저장된 위치에서 부터 NULL이 나오는 부분까지의 길이를 구하기 위해서 i를 증가함)
+	while ( pBuf[i] != 0 ) {  
+		i++;
+	}
+
+	if ( i > 1024 )
+		return NULL;
+
+	pDownlaod->pURL = (char *) malloc( 1024 );
+	memset( pDownlaod->pURL, 0, 1024 );
+
+	// 반복문에서 구한 길이 만큼 복사한다.
+	strncpy( pDownlaod->pURL, pBuf, i );
+	// ------------ GUID Value Parsing End
+
+	pBuf += (Download_URL_OFFSET - URL_URL_OFFSET);		// 0x1D4 - 0x68 = 0x16c
+
+	while (	pBuf[j] != 0x00 && pBuf[j+1] != 0x00 )
+	{
+		j++;
+	}
+
+	if ( j > 2048 )
+		return NULL;
+
+	pDownlaod->pReferer = (WCHAR *) malloc( 2048 );
+	memset( pDownlaod->pReferer, 0, 2048 );
+	wcsncpy( pDownlaod->pReferer, (WCHAR *)pBuf , j );
+	//memcpy( pDownlaod->pReferer, (WCHAR *)pBuf, j );
+
+	printf("\n\n DEBUG pReferer = %S\n\n", pDownlaod->pReferer);
+
+	pBuf += j+2; // DownloadURL로 포인터 이동.
+
+	while (	pBuf[k] != 0x00 && pBuf[k+1] != 0x00 )
+	{
+		k++;
+	}
+
+	if ( k > 2048 )
+		return NULL;
+
+	pDownlaod->pDownloadURL = (WCHAR *) malloc( 2048 );
+	memset( pDownlaod->pDownloadURL, 0, 2048 );
+	wcsncpy( pDownlaod->pDownloadURL, (WCHAR *)pBuf , j );
+
+	pBuf += k+2; // Location으로 포인터 이동.
+
+	while (	pBuf[l] != 0x00 && pBuf[l+1] != 0x00 )
+	{
+		l++;
+	}
+
+	if ( l > 2048 )
+		return NULL;
+
+	pDownlaod->pLocation = (WCHAR *) malloc( 2048 );
+	memset( pDownlaod->pLocation, 0, 2048 );
+	wcsncpy( pDownlaod->pLocation, (WCHAR *)pBuf , j );
+
+	return pDownlaod;	
 }
 
 struct history *getURL( char *pBuf, int nType ) {
@@ -109,6 +227,34 @@ struct history *getURL( char *pBuf, int nType ) {
 	return pHistory;	
 }
 
+void print_DownloadHistory( struct history_download *pDownlaod ) {
+
+	char bufType[256];
+
+	memset( bufType, 0, sizeof( bufType ) );
+	if ( pDownlaod->nType == TYPE_URL ) {
+		strcpy( bufType, "URL");
+	}
+	else if ( pDownlaod->nType == TYPE_REDR ) {
+		strcpy( bufType, "REDR");
+	}
+	
+	
+	fprintf(stdout, "%s|", bufType );   // URL or REDR
+	
+	/* The REDRs do not have a time stamp I think ..... */
+	if ( pDownlaod->nType != TYPE_REDR )
+		fprintf(stdout, "%d/%d/%d %d:%d:%d|", pDownlaod->st.wYear, pDownlaod->st.wMonth, pDownlaod->st.wDay, pDownlaod->st.wHour, pDownlaod->st.wMinute, pDownlaod->st.wSecond);
+	else
+		/* skip date and time */
+		fprintf(stdout, " |");	// 행 구분 문자
+
+	fprintf(stdout, "%s|\n", pDownlaod->pURL );  // URL 파싱.
+	fprintf(stdout, "%S|\n", pDownlaod->pReferer );
+	fprintf(stdout, "%S|\n", pDownlaod->pDownloadURL );
+	fprintf(stdout, "%S|\n", pDownlaod->pLocation );
+}
+
 void printHistory( struct history *pHistory ) {
 
 	char bufType[256];
@@ -130,7 +276,7 @@ void printHistory( struct history *pHistory ) {
 	else
 		/* skip date and time */
 		fprintf(stdout, " |");	// 행 구분 문자
-
+	
 	fprintf(stdout, "%s\n", pHistory->pURL );  // URL 파싱.
 
 }
@@ -149,7 +295,10 @@ int main(int argc, char **argv)
 	char *pBuf = NULL;
 	long lFileSize, lRead;
 	long i = 0;
+	
 	struct history *pHistory;
+	struct history_download *pDownload;
+	
 	int nType = 0;
 	DWORD dwURLCount = 0;
 
@@ -191,8 +340,10 @@ int main(int argc, char **argv)
 
 		if ( ( nType = bMatchPattern( pBuf + i ) ) > 0 )   // TYPE URL 혹은 REDR이 나온 경우에만 아래 구문 실행.
 		{
-			pHistory = getURL( pBuf + i, nType );
+			//pHistory = getURL( pBuf + i, nType );
+			pDownload = getDownload( pBuf +i, nType );
 
+			/*
 			if ( pHistory ) 
 			{
 				printHistory( pHistory );
@@ -200,6 +351,19 @@ int main(int argc, char **argv)
 				free( pHistory );
 				dwURLCount ++;
 			}
+			*/
+
+			if ( pDownload ) 
+			{
+				print_DownloadHistory( pDownload );
+				free( pDownload->pURL );
+				free( pDownload->pReferer );
+				free( pDownload->pDownloadURL );
+				free( pDownload->pLocation );
+				free (pDownload );
+				dwURLCount ++;
+			}
+
 		}
 		
 		i ++;
