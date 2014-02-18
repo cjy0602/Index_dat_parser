@@ -60,7 +60,7 @@ struct history_download {
 
 struct history_download_saved {
 	int nType;
-	char *pURL;
+	char pURL[1024];
 	SYSTEMTIME st;
 	CHAR pReferer[1024];
 	CHAR pDownloadURL[1024];
@@ -151,15 +151,14 @@ struct history_download *getDownload( char *pBuf, int nType ) {
 
 	while (	pBuf[j] != 0x00 || pBuf[j+1] != 0x00 )
 	{
-		printf( "pbuf[%d] = %x\n", j, pBuf[j]);
-		//printf( "pbuf[%d] = %x\n", j+1, pBuf[j+1]);
+		//printf( "pbuf[%d] = %x\n", j, pBuf[j]);
 		j++;
 	}
 
 	if ( j > 2048 )
 		return NULL;
 
-	printf(" \nString의 길이 = %d\n", j );
+	//printf(" \nString의 길이 = %d\n", j );
 	//j = j / 2 ;
 
 	pDownlaod->pReferer = (WCHAR *) malloc( 2048 );
@@ -173,8 +172,8 @@ struct history_download *getDownload( char *pBuf, int nType ) {
 	Temp0 = new char[len];
 	WideCharToMultiByte(CP_ACP, 0, pDownlaod->pReferer, -1, Temp0, 128, NULL, NULL);
 
-	wprintf(L"\n\n DEBUG pReferer = %s\n", pDownlaod->pReferer);
-	printf(" Convert = %s", Temp0);
+	//wprintf(L"\n\n DEBUG pReferer = %s\n", pDownlaod->pReferer);
+	//printf(" Convert = %s", Temp0);
 
 	/* Hex dump
 		printf("================== HEX DUMP START ===============\n");
@@ -210,8 +209,8 @@ struct history_download *getDownload( char *pBuf, int nType ) {
 
 	WideCharToMultiByte(CP_ACP, 0, pDownlaod->pDownloadURL, -1, Temp1, 128, NULL, NULL);
 
-	wprintf(L"\n\n DEBUG pDownloadURL = %s\n", pDownlaod->pDownloadURL);
-	printf(" Convert = %s", Temp1);
+	//wprintf(L"\n\n DEBUG pDownloadURL = %s\n", pDownlaod->pDownloadURL);
+	//printf(" Convert = %s", Temp1);
 
 	pBuf += k+3; // Location으로 포인터 이동.
 	//printf("pBuf의 세 글자 (오프셋 확인용) = %x\n\n", *pBuf) ;   // 0x68 이 나온다면 offset은 정확한 위치임.
@@ -236,8 +235,8 @@ struct history_download *getDownload( char *pBuf, int nType ) {
 
 	WideCharToMultiByte(CP_ACP, 0, pDownlaod->pLocation, -1, Temp2, 128, NULL, NULL);
 
-	wprintf(L"\n\n DEBUG pLocation = %s\n", pDownlaod->pLocation);
-	printf(" Convert = %s\n", Temp2);
+	//wprintf(L"\n\n DEBUG pLocation = %s\n", pDownlaod->pLocation);
+	//printf(" Convert = %s\n", Temp2);
 
 	//printf(" ############################# function END \n");
 
@@ -368,7 +367,6 @@ int main(int argc, char **argv)
 	char *pBuf = NULL;
 	long lFileSize, lRead;
 	long i = 0;
-	long z = 0;
 	
 	struct history *pHistory;
 	struct history_download *pDownload;
@@ -428,9 +426,18 @@ int main(int argc, char **argv)
 	nType = 0;
 
 	pDownload_saved = (struct history_download_saved *) calloc (dwURLCount, sizeof(struct history_download_saved));
+	if(pDownload_saved ==NULL){
+		 puts("Malloc Failed...");
+	     exit(1);
+	 }
+
+	//pDownload_saved = (struct history_download_saved *) malloc ( sizeof(struct history_download_saved) * dwURLCount );
+	//memset( pDownload_saved, 0, sizeof(struct history_download_saved) * dwURLCount );
+	
 	//pHistory = (struct history *)calloc(dwURLCount, sizeof(struct history));
 
-
+	int z = 0;
+	
 	while ( i<lFileSize ) {   // 0 ~ 파일 전체 크기 동안 반복. (1바이트씩 쭊 반복해서 파싱하는 구조)
 
 		if ( ( nType = bMatchPattern( pBuf + i ) ) > 0 )   // TYPE URL 혹은 REDR이 나온 경우에만 아래 구문 실행.
@@ -438,12 +445,9 @@ int main(int argc, char **argv)
 			//pHistory = getURL( pBuf + i, nType );
 			pDownload = getDownload( pBuf +i, nType );
 
-			printf("@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-			printf("nType = %d", pDownload->nType);
+			pDownload_saved[z].nType = (int)pDownload->nType;
+			pDownload_saved[z].st = (SYSTEMTIME) pDownload->st;
 
-			pDownload_saved[z].nType = pDownload->nType;
-			pDownload_saved[z].st = pDownload->st;
-						
 			strncpy(pDownload_saved[z].pURL, pDownload->pURL, 1024);
 
 			char *Referer = NULL;
@@ -470,6 +474,7 @@ int main(int argc, char **argv)
 
 			strncpy(pDownload_saved[z].pLocation, Location, 1024);
 			
+			z++;
 
 			/*
 			if ( pHistory ) 
@@ -483,7 +488,7 @@ int main(int argc, char **argv)
 
 			if ( pDownload ) 
 			{
-				print_DownloadHistory( pDownload );
+				//print_DownloadHistory( pDownload );
 				free( pDownload->pURL );
 				free( pDownload->pReferer );
 				free( pDownload->pDownloadURL );
@@ -494,13 +499,26 @@ int main(int argc, char **argv)
 		}
 		
 		i ++;
-		z ++;
 	}
 
 
 	fclose( pFD );
 	free( pBuf );
 
+
 	fprintf(stderr, "Urls retrieved %d\n", dwURLCount);
+
+	for ( z=0; z<dwURLCount; z++)
+	{
+		printf(" 들어간 값 확인1 : %d\n", pDownload_saved[z].nType);
+		printf(" 들어간 값 확인2 : %ld\n", pDownload_saved[z].st);
+		printf(" 들어간 값 확인3 : %s\n", pDownload_saved[z].pDownloadURL);
+		printf(" 들어간 값 확인4 : %s\n", pDownload_saved[z].pReferer);
+		printf(" 들어간 값 확인5 : %s\n", pDownload_saved[z].pLocation);
+		printf(" 들어간 값 확인6 : %s\n", pDownload_saved[z].pURL);
+
+	}
+
+
 
 }

@@ -1,291 +1,54 @@
-pbuf[0] = 68
-pbuf[1] = 0
-pbuf[2] = 74
-pbuf[3] = 0
-pbuf[4] = 74
-pbuf[5] = 0
-pbuf[6] = 70
-pbuf[7] = 0
-pbuf[8] = 3a
-pbuf[9] = 0
-pbuf[10] = 2f
-pbuf[11] = 0
-pbuf[12] = 2f
-pbuf[13] = 0
-pbuf[14] = 62
-pbuf[15] = 0
-pbuf[16] = 6c
-pbuf[17] = 0
-pbuf[18] = 6f
-pbuf[19] = 0
-pbuf[20] = 67
-pbuf[21] = 0
-pbuf[22] = 2e
-pbuf[23] = 0
-pbuf[24] = 6e
-pbuf[25] = 0
-pbuf[26] = 61
-pbuf[27] = 0
-pbuf[28] = 76
-pbuf[29] = 0
-pbuf[30] = 65
-pbuf[31] = 0
-pbuf[32] = 72
-pbuf[33] = 0
-pbuf[34] = 2e
-pbuf[35] = 0
-pbuf[36] = 63
-pbuf[37] = 0
-pbuf[38] = 6f
-pbuf[39] = 0
-pbuf[40] = 6d
-pbuf[41] = 0
-pbuf[42] = 2f
-pbuf[43] = 0
-pbuf[44] = 50
-pbuf[45] = 0
-pbuf[46] = 6f
-pbuf[47] = 0
-pbuf[48] = 73
-pbuf[49] = 0
-pbuf[50] = 74
-pbuf[51] = 0
-pbuf[52] = 56
-pbuf[53] = 0
-pbuf[54] = 69
-pbuf[55] = 0
-pbuf[56] = 65
-pbuf[57] = 0
-pbuf[58] = 77
-pbuf[59] = 0
-pbuf[60] = 2e
-pbuf[61] = 0
-pbuf[62] = 6e
-pbuf[63] = 0
-pbuf[64] = 68
-pbuf[65] = 0
-pbuf[66] = 6e
-pbuf[67] = 0
-pbuf[68] = 3f
-pbuf[69] = 0
-pbuf[70] = 62
-pbuf[71] = 0
-pbuf[72] = 6c
-pbuf[73] = 0
-pbuf[74] = 6f
-pbuf[75] = 0
-pbuf[76] = 67
-pbuf[77] = 0
-pbuf[78] = 49
-pbuf[79] = 0
-pbuf[80] = 64
-pbuf[81] = 0
-pbuf[82] = 3d
-pbuf[83] = 0
-pbuf[84] = 71
-pbuf[85] = 0
-pbuf[86] = 6f
-pbuf[87] = 0
-pbuf[88] = 72
-pbuf[89] = 0
-pbuf[90] = 74
-pbuf[91] = 0
-pbuf[92] = 6d
-pbuf[93] = 0
-pbuf[94] = 64
-pbuf[95] = 0
-pbuf[96] = 77
-pbuf[97] = 0
-pbuf[98] = 6e
-pbuf[99] = 0
-pbuf[100] = 30
-pbuf[101] = 0
-pbuf[102] = 39
-pbuf[103] = 0
-pbuf[104] = 31
-pbuf[105] = 0
-pbuf[106] = 38
-pbuf[107] = 0
-pbuf[108] = 26
-pbuf[109] = 0
-pbuf[110] = 6c
-pbuf[111] = 0
-pbuf[112] = 6f
-pbuf[113] = 0
-pbuf[114] = 67
-pbuf[115] = 0
-pbuf[116] = 4e
-pbuf[117] = 0
-pbuf[118] = 6f
-pbuf[119] = 0
-pbuf[120] = 3d
-pbuf[121] = 0
-pbuf[122] = 31
-pbuf[123] = 0
-pbuf[124] = 34
-pbuf[125] = 0
-pbuf[126] = 30
-pbuf[127] = 0
-pbuf[128] = 32
-pbuf[129] = 0
-pbuf[130] = 30
-pbuf[131] = 0
-pbuf[132] = 31
-pbuf[133] = 0
-pbuf[134] = 36
-pbuf[135] = 0
-pbuf[136] = 33
-pbuf[137] = 0
-pbuf[138] = 32
-pbuf[139] = 0
-pbuf[140] = 34
-pbuf[141] = 0
-pbuf[142] = 30
-pbuf[143] = 0
-pbuf[144] = 32
-pbuf[145] = 0
-pbuf[146] = 26
-pbuf[147] = 0
-pbuf[148] = 70
-pbuf[149] = 0
-pbuf[150] = 61
-pbuf[151] = 0
-pbuf[152] = 72
-pbuf[153] = 0
-pbuf[154] = 65
-pbuf[155] = 0
-pbuf[156] = 6e
-pbuf[157] = 0
-pbuf[158] = 74
-pbuf[159] = 0
-pbuf[160] = 43
-pbuf[161] = 0
-pbuf[162] = 61
-pbuf[163] = 0
-pbuf[164] = 74
-pbuf[165] = 0
-pbuf[166] = 65
-pbuf[167] = 0
-pbuf[168] = 67
-pbuf[169] = 0
-pbuf[170] = 6f
-pbuf[171] = 0
-pbuf[172] = 72
-pbuf[173] = 0
-pbuf[174] = 79
-pbuf[175] = 0
-pbuf[176] = 4e
-pbuf[177] = 0
-pbuf[178] = 6f
-pbuf[179] = 0
-pbuf[180] = 3d
-pbuf[181] = 0
-pbuf[182] = 26
-pbuf[183] = 0
-pbuf[184] = 63
-pbuf[185] = 0
-pbuf[186] = 61
-pbuf[187] = 0
-pbuf[188] = 74
-pbuf[189] = 0
-pbuf[190] = 65
-pbuf[191] = 0
-pbuf[192] = 67
-pbuf[193] = 0
-pbuf[194] = 6f
-pbuf[195] = 0
-pbuf[196] = 72
-pbuf[197] = 0
-pbuf[198] = 79
-pbuf[199] = 0
-pbuf[200] = 4e
-pbuf[201] = 0
-pbuf[202] = 6f
-pbuf[203] = 0
-pbuf[204] = 3d
-pbuf[205] = 0
-pbuf[206] = 26
-pbuf[207] = 0
-pbuf[208] = 76
-pbuf[209] = 0
-pbuf[210] = 69
-pbuf[211] = 0
-pbuf[212] = 65
-pbuf[213] = 0
-pbuf[214] = 77
-pbuf[215] = 0
-pbuf[216] = 44
-pbuf[217] = 0
-pbuf[218] = 61
-pbuf[219] = 0
-pbuf[220] = 74
-pbuf[221] = 0
-pbuf[222] = 65
-pbuf[223] = 0
-pbuf[224] = 3d
-pbuf[225] = 0
-pbuf[226] = 26
-pbuf[227] = 0
-pbuf[228] = 69
-pbuf[229] = 0
-pbuf[230] = 73
-pbuf[231] = 0
-pbuf[232] = 53
-pbuf[233] = 0
-pbuf[234] = 68
-pbuf[235] = 0
-pbuf[236] = 6f
-pbuf[237] = 0
-pbuf[238] = 77
-pbuf[239] = 0
-pbuf[240] = 50
-pbuf[241] = 0
-pbuf[242] = 6f
-pbuf[243] = 0
-pbuf[244] = 70
-pbuf[245] = 0
-pbuf[246] = 75
-pbuf[247] = 0
-pbuf[248] = 6c
-pbuf[249] = 0
-pbuf[250] = 61
-pbuf[251] = 0
-pbuf[252] = 72
-pbuf[253] = 0
-pbuf[254] = 50
-pbuf[255] = 0
-pbuf[256] = 6f
-pbuf[257] = 0
-pbuf[258] = 73
-pbuf[259] = 0
-pbuf[260] = 74
-pbuf[261] = 0
-pbuf[262] = 73
-pbuf[263] = 0
-pbuf[264] = 3d
-pbuf[265] = 0
-pbuf[266] = 66
-pbuf[267] = 0
-pbuf[268] = 61
-pbuf[269] = 0
-pbuf[270] = 6c
-pbuf[271] = 0
-pbuf[272] = 73
-pbuf[273] = 0
-pbuf[274] = 65
-pbuf[275] = 0
-pbuf[276] = 26
-pbuf[277] = 0
-pbuf[278] = 66
-pbuf[279] = 0
-pbuf[280] = 72
-pbuf[281] = 0
-pbuf[282] = 6f
-pbuf[283] = 0
-pbuf[284] = 6d
-pbuf[285] = 0
-pbuf[286] = 3d
-pbuf[287] = 0
-pbuf[288] = 70
-pbuf[289] = 0
-p
+ µé¾î°£ °ª È®ÀÎ1 : 1
+ µé¾î°£ °ª È®ÀÎ2 : 133086
+ µé¾î°£ °ª È®ÀÎ3 : http://blog.naver.com/PostView.nhn?blogId=qortmdwn0918&logNo=140201632402&parentCategoryNo=&categoryNo=&viewDate=&isShowPopularPÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍýýýý
+ µé¾î°£ °ª È®ÀÎ4 : http://blog.naver.com/PostView.nhn?blogId=qortmdwn0918&logNo=140201632402&parentCategoryNo=&categoryNo=&viewDate=&isShowPopularPÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍýýýý
+ µé¾î°£ °ª È®ÀÎ5 : http://blog.naver.com/PostView.nhn?blogId=qortmdwn0918&logNo=140201632402&parentCategoryNo=&categoryNo=&viewDate=&isShowPopularPÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍýýýý
+ µé¾î°£ °ª È®ÀÎ6 : iedownload:{59A93D1C-96DD-11E3-83DC-000C29B66945}
+ µé¾î°£ °ª È®ÀÎ1 : 1
+ µé¾î°£ °ª È®ÀÎ2 : 133086
+ µé¾î°£ °ª È®ÀÎ3 : http://encoding.tistory.com/53
+ µé¾î°£ °ª È®ÀÎ4 : http://encoding.tistory.com/53
+ µé¾î°£ °ª È®ÀÎ5 : http://encoding.tistory.com/53
+ µé¾î°£ °ª È®ÀÎ6 : iedownload:{A6058C9D-96DD-11E3-83DC-000C29B66945}
+ µé¾î°£ °ª È®ÀÎ1 : 1
+ µé¾î°£ °ª È®ÀÎ2 : 133086
+ µé¾î°£ °ª È®ÀÎ3 : http://encoding.tistory.com/entry/¹«¼³Ä¡-AIMP2-v251-build-32329112008-·¯½Ã¾Æ-À½¾ÇÀç»ý-ÇÃ·¹ÀÌ¾î
+ µé¾î°£ °ª È®ÀÎ4 : http://encoding.tistory.com/entry/¹«¼³Ä¡-AIMP2-v251-build-32329112008-·¯½Ã¾Æ-À½¾ÇÀç»ý-ÇÃ·¹ÀÌ¾î
+ µé¾î°£ °ª È®ÀÎ5 : http://encoding.tistory.com/entry/¹«¼³Ä¡-AIMP2-v251-build-32329112008-·¯½Ã¾Æ-À½¾ÇÀç»ý-ÇÃ·¹ÀÌ¾î
+ µé¾î°£ °ª È®ÀÎ6 : iedownload:{AEFCCBB5-96DD-11E3-83DC-000C29B66945}
+ µé¾î°£ °ª È®ÀÎ1 : 1
+ µé¾î°£ °ª È®ÀÎ2 : 133086
+ µé¾î°£ °ª È®ÀÎ3 : http://encoding.tistory.com/entry/Portable-ºü¸¥-½Ã½ºÅÛ-ÃÖÀûÈ­-ÀÌÁöÅ¬¸°-AS41
+ µé¾î°£ °ª È®ÀÎ4 : http://encoding.tistory.com/entry/Portable-ºü¸¥-½Ã½ºÅÛ-ÃÖÀûÈ­-ÀÌÁöÅ¬¸°-AS41
+ µé¾î°£ °ª È®ÀÎ5 : http://encoding.tistory.com/entry/Portable-ºü¸¥-½Ã½ºÅÛ-ÃÖÀûÈ­-ÀÌÁöÅ¬¸°-AS41
+ µé¾î°£ °ª È®ÀÎ6 : iedownload:{AEFCCBB6-96DD-11E3-83DC-000C29B66945}
+ µé¾î°£ °ª È®ÀÎ1 : 1
+ µé¾î°£ °ª È®ÀÎ2 : 133086
+ µé¾î°£ °ª È®ÀÎ3 : http://encoding.tistory.com/entry/Portable-ºü¸¥-½Ã½ºÅÛ-ÃÖÀûÈ­-ÀÌÁöÅ¬¸°-AS41
+ µé¾î°£ °ª È®ÀÎ4 : http://encoding.tistory.com/entry/Portable-ºü¸¥-½Ã½ºÅÛ-ÃÖÀûÈ­-ÀÌÁöÅ¬¸°-AS41
+ µé¾î°£ °ª È®ÀÎ5 : http://encoding.tistory.com/entry/Portable-ºü¸¥-½Ã½ºÅÛ-ÃÖÀûÈ­-ÀÌÁöÅ¬¸°-AS41
+ µé¾î°£ °ª È®ÀÎ6 : iedownload:{C8A10FF2-96DD-11E3-83DC-000C29B66945}
+ µé¾î°£ °ª È®ÀÎ1 : 1
+ µé¾î°£ °ª È®ÀÎ2 : 133086
+ µé¾î°£ °ª È®ÀÎ3 : http://encoding.tistory.com/entry/Portable-¼Õ½¬¿î-µ¿¿µ»ó-¹«·á-ÀÎÄÚµù-ÆÌÀÎÄÚ´õ-20090113
+ µé¾î°£ °ª È®ÀÎ4 : http://encoding.tistory.com/entry/Portable-¼Õ½¬¿î-µ¿¿µ»ó-¹«·á-ÀÎÄÚµù-ÆÌÀÎÄÚ´õ-20090113
+ µé¾î°£ °ª È®ÀÎ5 : http://encoding.tistory.com/entry/Portable-¼Õ½¬¿î-µ¿¿µ»ó-¹«·á-ÀÎÄÚµù-ÆÌÀÎÄÚ´õ-20090113
+ µé¾î°£ °ª È®ÀÎ6 : iedownload:{C8A10FF3-96DD-11E3-83DC-000C29B66945}
+ µé¾î°£ °ª È®ÀÎ1 : 1
+ µé¾î°£ °ª È®ÀÎ2 : 133086
+ µé¾î°£ °ª È®ÀÎ3 : http://encoding.tistory.com/entry/Portable-±âºÐ-ÁÁÀº-µ¿¿µ»ó-º¯È¯-À¯¸¶ÀÏ-ÀÎÄÚ´õ-Umile-Encoder-v1921
+ µé¾î°£ °ª È®ÀÎ4 : http://encoding.tistory.com/entry/Portable-±âºÐ-ÁÁÀº-µ¿¿µ»ó-º¯È¯-À¯¸¶ÀÏ-ÀÎÄÚ´õ-Umile-Encoder-v1921
+ µé¾î°£ °ª È®ÀÎ5 : http://encoding.tistory.com/entry/Portable-±âºÐ-ÁÁÀº-µ¿¿µ»ó-º¯È¯-À¯¸¶ÀÏ-ÀÎÄÚ´õ-Umile-Encoder-v1921
+ µé¾î°£ °ª È®ÀÎ6 : iedownload:{D1CAADAD-96DD-11E3-83DC-000C29B66945}
+ µé¾î°£ °ª È®ÀÎ1 : 1
+ µé¾î°£ °ª È®ÀÎ2 : 133086
+ µé¾î°£ °ª È®ÀÎ3 : http://www.systenance.com/indexdat.php
+ µé¾î°£ °ª È®ÀÎ4 : http://www.systenance.com/indexdat.php
+ µé¾î°£ °ª È®ÀÎ5 : http://www.systenance.com/indexdat.php
+ µé¾î°£ °ª È®ÀÎ6 : iedownload:{EC7E9658-96DF-11E3-83DC-000C29B66945}
+ µé¾î°£ °ª È®ÀÎ1 : 1
+ µé¾î°£ °ª È®ÀÎ2 : 133086
+ µé¾î°£ °ª È®ÀÎ3 : http://www.systenance.
+ µé¾î°£ °ª È®ÀÎ4 : http://www.systenance.
+ µé¾î°£ °ª È®ÀÎ5 : http://www.systenance.
+ µé¾î°£ °ª È®ÀÎ6 : iedownload:{EC7E9658-96DF-11E3-83DC-000C29B66945}
