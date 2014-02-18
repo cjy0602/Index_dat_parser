@@ -37,11 +37,17 @@ const int REDR_URL_OFFSET = 16;
 
 const int Download_URL_OFFSET = 468; // 0x1D4;
 
+// History, COokie, Caches 파싱 구조체
 struct history {
 	int nType;
 	char *pURL;
 	SYSTEMTIME st;
-	//SYSTEMTIME st2;
+};
+
+struct history_saved {
+	int nType;
+	char pURL[1024];
+	SYSTEMTIME st;
 };
 
 // IEHistoryDownload - index.dat Parsing Struct 
@@ -350,14 +356,6 @@ void printHistory( struct history *pHistory ) {
 
 }
 
-void usage(char **argv) {
-	
-	fprintf(stderr, "\nInternet History Viewer v.0.0.1 by patrik@cqure.net\n");
-	fprintf(stderr, "---------------------------------------------------\n");
-	fprintf(stderr, "usage: %s <historyfile>\n", argv[0]);
-
-}
-
 int main(int argc, char **argv) 
 {
 	//setlocale(LC_ALL, "korean");
@@ -367,23 +365,17 @@ int main(int argc, char **argv)
 	char *pBuf = NULL;
 	long lFileSize, lRead;
 	long i = 0;
+
+	int mode = 1; // 동작모드 설정 1 = cookie, history, cache 파싱 / 2 = download 리스트 파싱.
 	
 	struct history *pHistory;
+	struct history_saved *pHistory_saved;
+
 	struct history_download *pDownload;
 	struct history_download_saved *pDownload_saved;
 	
 	int nType = 0;
 	DWORD dwURLCount = 0;
-
-	if ( argc < 2 ) {
-		usage(argv);
-		exit(1);
-	}
-
-	if ( strncmp( argv[1], "-h", 2) == 0) {
-		usage( argv );
-		exit(1);
-	}
 
 	pFD = fopen(argv[1], "rb");
 
@@ -425,16 +417,25 @@ int main(int argc, char **argv)
 	i = 0;
 	nType = 0;
 
-	pDownload_saved = (struct history_download_saved *) calloc (dwURLCount, sizeof(struct history_download_saved));
-	if(pDownload_saved ==NULL){
-		 puts("Malloc Failed...");
-	     exit(1);
-	 }
+	if (mode == 1)
+	{
+		pHistory_saved = (struct history_saved *)calloc(dwURLCount, sizeof(struct history_saved));
+		if(pHistory_saved ==NULL){
+			 puts("pHistory_Saved Malloc Failed...");
+			 exit(1);
+		}
+	}
 
-	//pDownload_saved = (struct history_download_saved *) malloc ( sizeof(struct history_download_saved) * dwURLCount );
-	//memset( pDownload_saved, 0, sizeof(struct history_download_saved) * dwURLCount );
+	if (mode == 2)
+	{
+		pDownload_saved = (struct history_download_saved *) calloc (dwURLCount, sizeof(struct history_download_saved));
+		if(pDownload_saved ==NULL){
+			 puts("pDownload_Saved Malloc Failed...");
+			 exit(1);
+		}
+	}
 	
-	//pHistory = (struct history *)calloc(dwURLCount, sizeof(struct history));
+
 
 	int z = 0;
 	
@@ -442,58 +443,71 @@ int main(int argc, char **argv)
 
 		if ( ( nType = bMatchPattern( pBuf + i ) ) > 0 )   // TYPE URL 혹은 REDR이 나온 경우에만 아래 구문 실행.
 		{
-			//pHistory = getURL( pBuf + i, nType );
-			pDownload = getDownload( pBuf +i, nType );
 
-			pDownload_saved[z].nType = (int)pDownload->nType;
-			pDownload_saved[z].st = (SYSTEMTIME) pDownload->st;
-
-			strncpy(pDownload_saved[z].pURL, pDownload->pURL, 1024);
-
-			char *Referer = NULL;
-			int len1;
-			len1 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
-			Referer = new char[len1];
-			WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, Referer, 128, NULL, NULL);
-
-			strncpy(pDownload_saved[z].pReferer, Referer, 1024);
-
-			char *DownloadURL = NULL;
-			int len2;
-			len2 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
-			DownloadURL = new char[len2];
-			WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, DownloadURL, 128, NULL, NULL);
-
-			strncpy(pDownload_saved[z].pDownloadURL, DownloadURL, 1024);
-
-			char *Location = NULL;
-			int len3;
-			len3 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
-			Location = new char[len3];
-			WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, Location, 128, NULL, NULL);
-
-			strncpy(pDownload_saved[z].pLocation, Location, 1024);
-			
-			z++;
-
-			/*
-			if ( pHistory ) 
+			// Cookie, Cache, History   index.dat Parsing Part
+			if ( mode == 1)
 			{
-				printHistory( pHistory );
-				free( pHistory->pURL );
-				free( pHistory );
-				dwURLCount ++;
+				pHistory = getURL( pBuf + i, nType );
+
+				pHistory_saved[z].nType = (int)pHistory->nType;
+				pHistory_saved[z].st = (SYSTEMTIME) pHistory->st;
+				strncpy(pHistory_saved[z].pURL, pHistory->pURL, 1024);
+
+				z++;
+
+				if ( pHistory ) 
+				{
+					//printHistory( pHistory );
+					free( pHistory->pURL );
+					free( pHistory );
+				}
 			}
-			*/
 
-			if ( pDownload ) 
+			// DownloadList  index.dat Parsing Part			
+			if ( mode == 2)
 			{
-				//print_DownloadHistory( pDownload );
-				free( pDownload->pURL );
-				free( pDownload->pReferer );
-				free( pDownload->pDownloadURL );
-				free( pDownload->pLocation );
-				free (pDownload );
+				pDownload = getDownload( pBuf +i, nType );
+
+				pDownload_saved[z].nType = (int)pDownload->nType;
+				pDownload_saved[z].st = (SYSTEMTIME) pDownload->st;
+
+				strncpy(pDownload_saved[z].pURL, pDownload->pURL, 1024);
+
+				char *Referer = NULL;
+				int len1;
+				len1 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
+				Referer = new char[len1];
+				WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, Referer, 128, NULL, NULL);
+
+				strncpy(pDownload_saved[z].pReferer, Referer, 1024);
+
+				char *DownloadURL = NULL;
+				int len2;
+				len2 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
+				DownloadURL = new char[len2];
+				WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, DownloadURL, 128, NULL, NULL);
+
+				strncpy(pDownload_saved[z].pDownloadURL, DownloadURL, 1024);
+
+				char *Location = NULL;
+				int len3;
+				len3 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
+				Location = new char[len3];
+				WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, Location, 128, NULL, NULL);
+
+				strncpy(pDownload_saved[z].pLocation, Location, 1024);
+			
+				z++;
+
+				if ( pDownload ) 
+				{
+					//print_DownloadHistory( pDownload );
+					free( pDownload->pURL );
+					free( pDownload->pReferer );
+					free( pDownload->pDownloadURL );
+					free( pDownload->pLocation );
+					free (pDownload );
+				}
 			}
 
 		}
@@ -508,17 +522,45 @@ int main(int argc, char **argv)
 
 	fprintf(stderr, "Urls retrieved %d\n", dwURLCount);
 
-	for ( z=0; z<dwURLCount; z++)
+	if (mode == 1)
 	{
-		printf(" 들어간 값 확인1 : %d\n", pDownload_saved[z].nType);
-		printf(" 들어간 값 확인2 : %ld\n", pDownload_saved[z].st);
-		printf(" 들어간 값 확인3 : %s\n", pDownload_saved[z].pDownloadURL);
-		printf(" 들어간 값 확인4 : %s\n", pDownload_saved[z].pReferer);
-		printf(" 들어간 값 확인5 : %s\n", pDownload_saved[z].pLocation);
-		printf(" 들어간 값 확인6 : %s\n", pDownload_saved[z].pURL);
+		for ( z=0; z<dwURLCount; z++)
+		{
+			printf(" 들어간 값 확인1 : %d\n", pHistory_saved[z].nType);
+			printf(" 들어간 값 확인2 : %ld\n", pHistory_saved[z].st);
+			printf(" 들어간 값 확인3 : %s\n", pHistory_saved[z].pURL);
+		}
+	}
 
+	if (mode == 2)
+	{
+		for ( z=0; z<dwURLCount; z++)
+		{
+			printf(" 들어간 값 확인1 : %d\n", pDownload_saved[z].nType);
+			printf(" 들어간 값 확인2 : %ld\n", pDownload_saved[z].st);
+			printf(" 들어간 값 확인3 : %s\n", pDownload_saved[z].pDownloadURL);
+			printf(" 들어간 값 확인4 : %s\n", pDownload_saved[z].pReferer);
+			printf(" 들어간 값 확인5 : %s\n", pDownload_saved[z].pLocation);
+			printf(" 들어간 값 확인6 : %s\n", pDownload_saved[z].pURL);
+		}
 	}
 
 
+	
+	if (mode == 1)
+	{
+			// DB에 넣는 코드 작성!!!!! 
+	}
+
+	if (mode == 2)
+	{
+			// DB넣는 코드 작성 !!!
+	}
+
+	if ( mode == 1 )
+		free (pHistory_saved);
+
+	if (mode == 2)
+		free (pDownload_saved);
 
 }
