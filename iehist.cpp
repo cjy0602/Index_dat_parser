@@ -26,8 +26,6 @@
 #include <string.h>
 #include <locale.h>
 
-
-
 const int TYPE_URL  = 0x01;
 const int TYPE_REDR = 0x02;
 
@@ -41,20 +39,20 @@ const int Download_URL_OFFSET = 468; // 0x1D4;
 struct history {
 	int nType;
 	char *pURL;
-	SYSTEMTIME st;
+	FILETIME st;
 };
 
 struct history_saved {
 	int nType;
 	char pURL[1024];
-	SYSTEMTIME st;
+	FILETIME st;
 };
 
 // IEHistoryDownload - index.dat Parsing Struct 
 struct history_download {
 	int nType;
 	char *pURL;
-	SYSTEMTIME st;
+	FILETIME st;
 	WCHAR *pReferer;
 	WCHAR *pDownloadURL;
 	WCHAR *pLocation;
@@ -67,7 +65,7 @@ struct history_download {
 struct history_download_saved {
 	int nType;
 	char pURL[1024];
-	SYSTEMTIME st;
+	FILETIME st;
 	CHAR pReferer[1024];
 	CHAR pDownloadURL[1024];
 	CHAR pLocation[1024];
@@ -83,13 +81,14 @@ int bMatchPattern( char *pBuf ) {
 		return TYPE_URL;
 	}
 
+	
 	if ( pBuf[0] == 0x52 && pBuf[1] == 0x45 && pBuf[2] == 0x44 && pBuf[3] == 0x52 ) 
 	{
 		return TYPE_REDR;
 	}
 
 	return 0;
-
+	
 }
 
 struct history_download *getDownload( char *pBuf, int nType ) {
@@ -111,7 +110,8 @@ struct history_download *getDownload( char *pBuf, int nType ) {
 		memcpy( (DWORD *)&ft.dwLowDateTime, pBuf + URL_TIME_OFFSET, sizeof( DWORD ) );
 		memcpy( (DWORD *)&ft.dwHighDateTime, pBuf + URL_TIME_OFFSET + 4, sizeof( DWORD ) );
 		                                 
-		FileTimeToSystemTime( &ft, &pDownlaod->st );
+		//FileTimeToSystemTime( &ft, &pDownlaod->st );
+		pDownlaod->st = ft;
 		pDownlaod->nType = TYPE_URL;
 
 		pBuf += URL_URL_OFFSET;
@@ -122,7 +122,8 @@ struct history_download *getDownload( char *pBuf, int nType ) {
 		pDownlaod = (struct history_download*) malloc ( sizeof( struct history_download ) );
 		ft.dwHighDateTime = 0;
 		ft.dwLowDateTime = 0;
-		FileTimeToSystemTime( &ft, &pDownlaod->st );
+		//FileTimeToSystemTime( &ft, &pDownlaod->st );
+		pDownlaod->st = ft;
 		pDownlaod->nType = TYPE_REDR;
 		pBuf += REDR_URL_OFFSET;
 	}
@@ -259,12 +260,12 @@ struct history *getURL( char *pBuf, int nType ) {
 
 		pHistory = (struct history*) malloc ( sizeof( struct history ) );
 
-		// Fri Nov 22 1963 00:00:00 형식을 원한다. 
 		// Last accessed Time Stamp 구조체에 저장.
 		memcpy( (DWORD *)&ft.dwLowDateTime, pBuf + URL_TIME_OFFSET, sizeof( DWORD ) );
 		memcpy( (DWORD *)&ft.dwHighDateTime, pBuf + URL_TIME_OFFSET + 4, sizeof( DWORD ) );
 
-		FileTimeToSystemTime( &ft, &pHistory->st );
+		//FileTimeToSystemTime( &ft, &pHistory->st );
+		pHistory->st = ft;
 		pHistory->nType = TYPE_URL;
 
 		pBuf += URL_URL_OFFSET;
@@ -276,7 +277,8 @@ struct history *getURL( char *pBuf, int nType ) {
 		pHistory = (struct history*) malloc ( sizeof( struct history ) );
 		ft.dwHighDateTime = 0;
 		ft.dwLowDateTime = 0;
-		FileTimeToSystemTime( &ft, &pHistory->st );
+		//FileTimeToSystemTime( &ft, &pHistory->st );
+		pHistory->st = ft;
 		pHistory->nType = TYPE_REDR;
 		pBuf += REDR_URL_OFFSET;
 	}
@@ -294,6 +296,10 @@ struct history *getURL( char *pBuf, int nType ) {
 		return NULL;
 
 	pHistory->pURL = (char *) malloc( 1024 );
+	if(pHistory->pURL ==NULL){
+			puts("pHistory->pURL Malloc Failed...");
+			exit(1);
+	}
 	memset( pHistory->pURL, 0, 1024 );
 
 	// 반복문에서 구한 길이 만큼 복사한다.
@@ -316,13 +322,14 @@ void print_DownloadHistory( struct history_download *pDownlaod ) {
 	
 	
 	fprintf(stdout, "%s|", bufType );   // URL or REDR
-	
-	/* The REDRs do not have a time stamp I think ..... */
+	/*
+		// The REDRs do not have a time stamp I think ..... 
 	if ( pDownlaod->nType != TYPE_REDR )
 		fprintf(stdout, "%d/%d/%d %d:%d:%d|", pDownlaod->st.wYear, pDownlaod->st.wMonth, pDownlaod->st.wDay, pDownlaod->st.wHour, pDownlaod->st.wMinute, pDownlaod->st.wSecond);
 	else
-		/* skip date and time */
+		// skip date and time 
 		fprintf(stdout, " |");	// 행 구분 문자
+	*/
 
 	fprintf(stdout, "%s|", pDownlaod->pURL );  // URL 파싱.
 	fprintf(stdout, "%S|", pDownlaod->pReferer );
@@ -345,13 +352,15 @@ void printHistory( struct history *pHistory ) {
 	
 	fprintf(stdout, "%s|", bufType );   // URL or REDR
 	
-	/* The REDRs do not have a time stamp I think ..... */
+	/* 
+		// The REDRs do not have a time stamp I think ..... 
 	if ( pHistory->nType != TYPE_REDR )
 		fprintf(stdout, "%d/%d/%d %d:%d:%d|", pHistory->st.wYear, pHistory->st.wMonth, pHistory->st.wDay, pHistory->st.wHour, pHistory->st.wMinute, pHistory->st.wSecond);
 	else
-		/* skip date and time */
+	    // skip date and time 
 		fprintf(stdout, " |");	// 행 구분 문자
-	
+	*/
+
 	fprintf(stdout, "%s\n", pHistory->pURL );  // URL 파싱.
 
 }
@@ -366,7 +375,7 @@ int main(int argc, char **argv)
 	long lFileSize, lRead;
 	long i = 0;
 
-	int mode = 1; // 동작모드 설정 1 = cookie, history, cache 파싱 / 2 = download 리스트 파싱.
+	int mode = 2; // 동작모드 설정 1 = cookie, history, cache 파싱 / 2 = download 리스트 파싱.
 	
 	struct history *pHistory;
 	struct history_saved *pHistory_saved;
@@ -449,12 +458,18 @@ int main(int argc, char **argv)
 			{
 				pHistory = getURL( pBuf + i, nType );
 
+				
 				pHistory_saved[z].nType = (int)pHistory->nType;
-				pHistory_saved[z].st = (SYSTEMTIME) pHistory->st;
+				pHistory_saved[z].st = (FILETIME) pHistory->st;
 				strncpy(pHistory_saved[z].pURL, pHistory->pURL, 1024);
-
-				z++;
-
+				
+				//printf ( "entry = %d\n", z );
+				//printf ( "test 1 %d\n", pHistory_saved[z].nType );
+				//printf ( "test 2 %s\n", pHistory_saved[z].pURL );
+				//printf ( "test 2 %ld\n\n", pHistory_saved[z].st );
+				
+				z ++;
+				
 				if ( pHistory ) 
 				{
 					//printHistory( pHistory );
@@ -469,11 +484,11 @@ int main(int argc, char **argv)
 				pDownload = getDownload( pBuf +i, nType );
 
 				pDownload_saved[z].nType = (int)pDownload->nType;
-				pDownload_saved[z].st = (SYSTEMTIME) pDownload->st;
+				pDownload_saved[z].st = (FILETIME) pDownload->st;
 
 				strncpy(pDownload_saved[z].pURL, pDownload->pURL, 1024);
 
-				char *Referer = NULL;
+				char *Referer;
 				int len1;
 				len1 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
 				Referer = new char[len1];
@@ -481,19 +496,19 @@ int main(int argc, char **argv)
 
 				strncpy(pDownload_saved[z].pReferer, Referer, 1024);
 
-				char *DownloadURL = NULL;
+				char *DownloadURL;
 				int len2;
-				len2 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
+				len2 = WideCharToMultiByte(CP_ACP, 0, pDownload->pDownloadURL, -1, NULL, 0, NULL,NULL);
 				DownloadURL = new char[len2];
-				WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, DownloadURL, 128, NULL, NULL);
+				WideCharToMultiByte(CP_ACP, 0, pDownload->pDownloadURL, -1, DownloadURL, 128, NULL, NULL);
 
 				strncpy(pDownload_saved[z].pDownloadURL, DownloadURL, 1024);
 
-				char *Location = NULL;
+				char *Location;
 				int len3;
-				len3 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
+				len3 = WideCharToMultiByte(CP_ACP, 0, pDownload->pLocation, -1, NULL, 0, NULL,NULL);
 				Location = new char[len3];
-				WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, Location, 128, NULL, NULL);
+				WideCharToMultiByte(CP_ACP, 0, pDownload->pLocation, -1, Location, 128, NULL, NULL);
 
 				strncpy(pDownload_saved[z].pLocation, Location, 1024);
 			
@@ -515,6 +530,7 @@ int main(int argc, char **argv)
 		i ++;
 	}
 
+	printf ( " LOOP 탈출 \n");
 
 	fclose( pFD );
 	free( pBuf );
@@ -527,7 +543,7 @@ int main(int argc, char **argv)
 		for ( z=0; z<dwURLCount; z++)
 		{
 			printf(" 들어간 값 확인1 : %d\n", pHistory_saved[z].nType);
-			printf(" 들어간 값 확인2 : %ld\n", pHistory_saved[z].st);
+			printf(" 들어간 값 확인2 : %I64d\n", pHistory_saved[z].st);
 			printf(" 들어간 값 확인3 : %s\n", pHistory_saved[z].pURL);
 		}
 	}
@@ -537,7 +553,7 @@ int main(int argc, char **argv)
 		for ( z=0; z<dwURLCount; z++)
 		{
 			printf(" 들어간 값 확인1 : %d\n", pDownload_saved[z].nType);
-			printf(" 들어간 값 확인2 : %ld\n", pDownload_saved[z].st);
+			printf(" 들어간 값 확인2 : %I64d\n", pDownload_saved[z].st);
 			printf(" 들어간 값 확인3 : %s\n", pDownload_saved[z].pDownloadURL);
 			printf(" 들어간 값 확인4 : %s\n", pDownload_saved[z].pReferer);
 			printf(" 들어간 값 확인5 : %s\n", pDownload_saved[z].pLocation);
