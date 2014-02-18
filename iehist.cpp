@@ -58,6 +58,15 @@ struct history_download {
 	//char *pLocation;
 };
 
+struct history_download_saved {
+	int nType;
+	char *pURL;
+	SYSTEMTIME st;
+	CHAR pReferer[1024];
+	CHAR pDownloadURL[1024];
+	CHAR pLocation[1024];
+};
+
 
 int bMatchPattern( char *pBuf ) {
 
@@ -155,7 +164,7 @@ struct history_download *getDownload( char *pBuf, int nType ) {
 
 	pDownlaod->pReferer = (WCHAR *) malloc( 2048 );
 	memset( pDownlaod->pReferer, 0, 2048 );
-	wcsncpy( pDownlaod->pReferer, (WCHAR *)pBuf , j );
+	//wcsncpy( pDownlaod->pReferer, (WCHAR *)pBuf , j );
 	memcpy ( pDownlaod->pReferer, pBuf , j+1);
 
 	char *Temp0;
@@ -230,6 +239,7 @@ struct history_download *getDownload( char *pBuf, int nType ) {
 	wprintf(L"\n\n DEBUG pLocation = %s\n", pDownlaod->pLocation);
 	printf(" Convert = %s\n", Temp2);
 
+	//printf(" ############################# function END \n");
 
 	return pDownlaod;	
 }
@@ -358,9 +368,11 @@ int main(int argc, char **argv)
 	char *pBuf = NULL;
 	long lFileSize, lRead;
 	long i = 0;
+	long z = 0;
 	
 	struct history *pHistory;
 	struct history_download *pDownload;
+	struct history_download_saved *pDownload_saved;
 	
 	int nType = 0;
 	DWORD dwURLCount = 0;
@@ -399,12 +411,65 @@ int main(int argc, char **argv)
 		fprintf(stderr, "WARNING: Failed to read complete file\n");
 	}
 
+	
+	// 구조체 동적 할당을 위한 전체 엔트리 갯수 구함
+	while ( i < lFileSize )
+	{
+		if ( ( nType = bMatchPattern( pBuf + i ) ) > 0 ) 
+		{
+				dwURLCount ++;		
+		}
+		i++;
+	}
+	
+	//printf("@@@@ DEBUG 전체 entry 갯 수 = %d\n", dwURLCount);
+	
+	i = 0;
+	nType = 0;
+
+	pDownload_saved = (struct history_download_saved *) calloc (dwURLCount, sizeof(struct history_download_saved));
+	//pHistory = (struct history *)calloc(dwURLCount, sizeof(struct history));
+
+
 	while ( i<lFileSize ) {   // 0 ~ 파일 전체 크기 동안 반복. (1바이트씩 쭊 반복해서 파싱하는 구조)
 
 		if ( ( nType = bMatchPattern( pBuf + i ) ) > 0 )   // TYPE URL 혹은 REDR이 나온 경우에만 아래 구문 실행.
 		{
 			//pHistory = getURL( pBuf + i, nType );
 			pDownload = getDownload( pBuf +i, nType );
+
+			printf("@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+			printf("nType = %d", pDownload->nType);
+
+			pDownload_saved[z].nType = pDownload->nType;
+			pDownload_saved[z].st = pDownload->st;
+						
+			strncpy(pDownload_saved[z].pURL, pDownload->pURL, 1024);
+
+			char *Referer = NULL;
+			int len1;
+			len1 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
+			Referer = new char[len1];
+			WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, Referer, 128, NULL, NULL);
+
+			strncpy(pDownload_saved[z].pReferer, Referer, 1024);
+
+			char *DownloadURL = NULL;
+			int len2;
+			len2 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
+			DownloadURL = new char[len2];
+			WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, DownloadURL, 128, NULL, NULL);
+
+			strncpy(pDownload_saved[z].pDownloadURL, DownloadURL, 1024);
+
+			char *Location = NULL;
+			int len3;
+			len3 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
+			Location = new char[len3];
+			WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, Location, 128, NULL, NULL);
+
+			strncpy(pDownload_saved[z].pLocation, Location, 1024);
+			
 
 			/*
 			if ( pHistory ) 
@@ -418,18 +483,18 @@ int main(int argc, char **argv)
 
 			if ( pDownload ) 
 			{
-				//print_DownloadHistory( pDownload );
+				print_DownloadHistory( pDownload );
 				free( pDownload->pURL );
 				free( pDownload->pReferer );
 				free( pDownload->pDownloadURL );
 				free( pDownload->pLocation );
 				free (pDownload );
-				dwURLCount ++;
 			}
 
 		}
 		
 		i ++;
+		z ++;
 	}
 
 
