@@ -25,6 +25,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
+#include <winbase.h>
+#include <winnt.h>
+#include <time.h>
+
 
 const int TYPE_URL  = 0x01;
 const int TYPE_REDR = 0x02;
@@ -45,7 +49,8 @@ struct history {
 struct history_saved {
 	int nType;
 	char pURL[1024];
-	FILETIME st;
+	//FILETIME st;
+	unsigned __int64 epoch;
 };
 
 // IEHistoryDownload - index.dat Parsing Struct 
@@ -65,12 +70,19 @@ struct history_download {
 struct history_download_saved {
 	int nType;
 	char pURL[1024];
-	FILETIME st;
+	//FILETIME st;
+	unsigned __int64 epoch;
 	CHAR pReferer[1024];
 	CHAR pDownloadURL[1024];
 	CHAR pLocation[1024];
 };
 
+
+void FileTimeToUnixTime(LPFILETIME pft, unsigned __int64 * pt) {
+    LONGLONG ll; // 64 bit value
+    ll = (((LONGLONG)(pft->dwHighDateTime)) << 32) + pft->dwLowDateTime;
+    *pt = (time_t)((ll - 116444736000000000L) / 10000000L);
+}
 
 int bMatchPattern( char *pBuf ) {
 
@@ -445,7 +457,7 @@ int main(int argc, char **argv)
 	}
 	
 
-
+	unsigned __int64 _timestamp;
 	int z = 0;
 	
 	while ( i<lFileSize ) {   // 0 ~ 파일 전체 크기 동안 반복. (1바이트씩 쭊 반복해서 파싱하는 구조)
@@ -460,7 +472,10 @@ int main(int argc, char **argv)
 
 				
 				pHistory_saved[z].nType = (int)pHistory->nType;
-				pHistory_saved[z].st = (FILETIME) pHistory->st;
+				
+				FileTimeToUnixTime(&pDownload->st, &_timestamp);
+				pHistory_saved[z].epoch = _timestamp;
+
 				strncpy(pHistory_saved[z].pURL, pHistory->pURL, 1024);
 				
 				//printf ( "entry = %d\n", z );
@@ -484,7 +499,9 @@ int main(int argc, char **argv)
 				pDownload = getDownload( pBuf +i, nType );
 
 				pDownload_saved[z].nType = (int)pDownload->nType;
-				pDownload_saved[z].st = (FILETIME) pDownload->st;
+
+				FileTimeToUnixTime(&pDownload->st, &_timestamp);
+				pDownload_saved[z].epoch = _timestamp;
 
 				strncpy(pDownload_saved[z].pURL, pDownload->pURL, 1024);
 
@@ -543,7 +560,7 @@ int main(int argc, char **argv)
 		for ( z=0; z<dwURLCount; z++)
 		{
 			printf(" 들어간 값 확인1 : %d\n", pHistory_saved[z].nType);
-			printf(" 들어간 값 확인2 : %I64d\n", pHistory_saved[z].st);
+			printf(" 들어간 값 확인2 : %I64d\n", pHistory_saved[z].epoch);
 			printf(" 들어간 값 확인3 : %s\n", pHistory_saved[z].pURL);
 		}
 	}
@@ -553,7 +570,7 @@ int main(int argc, char **argv)
 		for ( z=0; z<dwURLCount; z++)
 		{
 			printf(" 들어간 값 확인1 : %d\n", pDownload_saved[z].nType);
-			printf(" 들어간 값 확인2 : %I64d\n", pDownload_saved[z].st);
+			printf(" 들어간 값 확인2 : %I64d\n", pDownload_saved[z].epoch);
 			printf(" 들어간 값 확인3 : %s\n", pDownload_saved[z].pDownloadURL);
 			printf(" 들어간 값 확인4 : %s\n", pDownload_saved[z].pReferer);
 			printf(" 들어간 값 확인5 : %s\n", pDownload_saved[z].pLocation);
