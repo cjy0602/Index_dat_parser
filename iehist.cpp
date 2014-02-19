@@ -683,17 +683,17 @@ int main(int argc, char **argv)
 
 				char *DownloadURL = NULL;
 				int len2;
-				len2 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
+				len2 = WideCharToMultiByte(CP_ACP, 0, pDownload->pDownloadURL, -1, NULL, 0, NULL,NULL);
 				DownloadURL = new char[len2];
-				WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, DownloadURL, 128, NULL, NULL);
+				WideCharToMultiByte(CP_ACP, 0, pDownload->pDownloadURL, -1, DownloadURL, 128, NULL, NULL);
 
 				strncpy(pDownload_saved[z].pDownloadURL, DownloadURL, 1024);
 
 				char *Location = NULL;
 				int len3;
-				len3 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
+				len3 = WideCharToMultiByte(CP_ACP, 0, pDownload->pLocation, -1, NULL, 0, NULL,NULL);
 				Location = new char[len3];
-				WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, Location, 128, NULL, NULL);
+				WideCharToMultiByte(CP_ACP, 0, pDownload->pLocation, -1, Location, 128, NULL, NULL);
 
 				strncpy(pDownload_saved[z].pLocation, Location, 1024);
 			
@@ -719,7 +719,7 @@ int main(int argc, char **argv)
 	fclose( pFD );
 	free( pBuf );
 
-
+	/*
 	fprintf(stderr, "Urls retrieved %d\n", dwURLCount);
 
 	if (mode == 1)
@@ -744,7 +744,7 @@ int main(int argc, char **argv)
 			printf(" 들어간 값 확인6 : %s\n", pDownload_saved[z].pURL);
 		}
 	}
-
+	*/
 
 	
 	if (mode == 1)
