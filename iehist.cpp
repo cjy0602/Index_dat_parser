@@ -25,9 +25,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
-#include <winbase.h>
-#include <winnt.h>
-#include <time.h>
+#include "c:\Users\cjy\Desktop\MFTParser\sqlite\Debug\sqlite3.h"
+#include "time.h"
+
 
 
 const int TYPE_URL  = 0x01;
@@ -39,25 +39,25 @@ const int REDR_URL_OFFSET = 16;
 
 const int Download_URL_OFFSET = 468; // 0x1D4;
 
+DWORD dwURLCount = 0;
 // History, COokie, Caches 파싱 구조체
 struct history {
 	int nType;
 	char *pURL;
-	FILETIME st;
+	SYSTEMTIME st;
 };
 
 struct history_saved {
 	int nType;
 	char pURL[1024];
-	//FILETIME st;
-	unsigned __int64 epoch;
+	SYSTEMTIME st;
 };
 
 // IEHistoryDownload - index.dat Parsing Struct 
 struct history_download {
 	int nType;
 	char *pURL;
-	FILETIME st;
+	SYSTEMTIME st;
 	WCHAR *pReferer;
 	WCHAR *pDownloadURL;
 	WCHAR *pLocation;
@@ -70,19 +70,12 @@ struct history_download {
 struct history_download_saved {
 	int nType;
 	char pURL[1024];
-	//FILETIME st;
-	unsigned __int64 epoch;
+	SYSTEMTIME st;
 	CHAR pReferer[1024];
 	CHAR pDownloadURL[1024];
 	CHAR pLocation[1024];
 };
 
-
-void FileTimeToUnixTime(LPFILETIME pft, unsigned __int64 * pt) {
-    LONGLONG ll; // 64 bit value
-    ll = (((LONGLONG)(pft->dwHighDateTime)) << 32) + pft->dwLowDateTime;
-    *pt = (time_t)((ll - 116444736000000000L) / 10000000L);
-}
 
 int bMatchPattern( char *pBuf ) {
 
@@ -93,14 +86,13 @@ int bMatchPattern( char *pBuf ) {
 		return TYPE_URL;
 	}
 
-	
 	if ( pBuf[0] == 0x52 && pBuf[1] == 0x45 && pBuf[2] == 0x44 && pBuf[3] == 0x52 ) 
 	{
 		return TYPE_REDR;
 	}
 
 	return 0;
-	
+
 }
 
 struct history_download *getDownload( char *pBuf, int nType ) {
@@ -122,8 +114,7 @@ struct history_download *getDownload( char *pBuf, int nType ) {
 		memcpy( (DWORD *)&ft.dwLowDateTime, pBuf + URL_TIME_OFFSET, sizeof( DWORD ) );
 		memcpy( (DWORD *)&ft.dwHighDateTime, pBuf + URL_TIME_OFFSET + 4, sizeof( DWORD ) );
 		                                 
-		//FileTimeToSystemTime( &ft, &pDownlaod->st );
-		pDownlaod->st = ft;
+		FileTimeToSystemTime( &ft, &pDownlaod->st );
 		pDownlaod->nType = TYPE_URL;
 
 		pBuf += URL_URL_OFFSET;
@@ -134,8 +125,7 @@ struct history_download *getDownload( char *pBuf, int nType ) {
 		pDownlaod = (struct history_download*) malloc ( sizeof( struct history_download ) );
 		ft.dwHighDateTime = 0;
 		ft.dwLowDateTime = 0;
-		//FileTimeToSystemTime( &ft, &pDownlaod->st );
-		pDownlaod->st = ft;
+		FileTimeToSystemTime( &ft, &pDownlaod->st );
 		pDownlaod->nType = TYPE_REDR;
 		pBuf += REDR_URL_OFFSET;
 	}
@@ -272,12 +262,12 @@ struct history *getURL( char *pBuf, int nType ) {
 
 		pHistory = (struct history*) malloc ( sizeof( struct history ) );
 
+		// Fri Nov 22 1963 00:00:00 형식을 원한다. 
 		// Last accessed Time Stamp 구조체에 저장.
 		memcpy( (DWORD *)&ft.dwLowDateTime, pBuf + URL_TIME_OFFSET, sizeof( DWORD ) );
 		memcpy( (DWORD *)&ft.dwHighDateTime, pBuf + URL_TIME_OFFSET + 4, sizeof( DWORD ) );
 
-		//FileTimeToSystemTime( &ft, &pHistory->st );
-		pHistory->st = ft;
+		FileTimeToSystemTime( &ft, &pHistory->st );
 		pHistory->nType = TYPE_URL;
 
 		pBuf += URL_URL_OFFSET;
@@ -289,8 +279,7 @@ struct history *getURL( char *pBuf, int nType ) {
 		pHistory = (struct history*) malloc ( sizeof( struct history ) );
 		ft.dwHighDateTime = 0;
 		ft.dwLowDateTime = 0;
-		//FileTimeToSystemTime( &ft, &pHistory->st );
-		pHistory->st = ft;
+		FileTimeToSystemTime( &ft, &pHistory->st );
 		pHistory->nType = TYPE_REDR;
 		pBuf += REDR_URL_OFFSET;
 	}
@@ -308,10 +297,6 @@ struct history *getURL( char *pBuf, int nType ) {
 		return NULL;
 
 	pHistory->pURL = (char *) malloc( 1024 );
-	if(pHistory->pURL ==NULL){
-			puts("pHistory->pURL Malloc Failed...");
-			exit(1);
-	}
 	memset( pHistory->pURL, 0, 1024 );
 
 	// 반복문에서 구한 길이 만큼 복사한다.
@@ -334,14 +319,13 @@ void print_DownloadHistory( struct history_download *pDownlaod ) {
 	
 	
 	fprintf(stdout, "%s|", bufType );   // URL or REDR
-	/*
-		// The REDRs do not have a time stamp I think ..... 
+	
+	/* The REDRs do not have a time stamp I think ..... */
 	if ( pDownlaod->nType != TYPE_REDR )
 		fprintf(stdout, "%d/%d/%d %d:%d:%d|", pDownlaod->st.wYear, pDownlaod->st.wMonth, pDownlaod->st.wDay, pDownlaod->st.wHour, pDownlaod->st.wMinute, pDownlaod->st.wSecond);
 	else
-		// skip date and time 
+		/* skip date and time */
 		fprintf(stdout, " |");	// 행 구분 문자
-	*/
 
 	fprintf(stdout, "%s|", pDownlaod->pURL );  // URL 파싱.
 	fprintf(stdout, "%S|", pDownlaod->pReferer );
@@ -364,18 +348,213 @@ void printHistory( struct history *pHistory ) {
 	
 	fprintf(stdout, "%s|", bufType );   // URL or REDR
 	
-	/* 
-		// The REDRs do not have a time stamp I think ..... 
+	/* The REDRs do not have a time stamp I think ..... */
 	if ( pHistory->nType != TYPE_REDR )
 		fprintf(stdout, "%d/%d/%d %d:%d:%d|", pHistory->st.wYear, pHistory->st.wMonth, pHistory->st.wDay, pHistory->st.wHour, pHistory->st.wMinute, pHistory->st.wSecond);
 	else
-	    // skip date and time 
+		/* skip date and time */
 		fprintf(stdout, " |");	// 행 구분 문자
-	*/
-
+	
 	fprintf(stdout, "%s\n", pHistory->pURL );  // URL 파싱.
 
 }
+
+time_t TimeFromSystemTime(const SYSTEMTIME pTime)
+{
+    struct tm tm;
+	time_t t;
+	
+    memset(&tm, 0, sizeof(tm));
+
+	 tm.tm_hour = pTime.wHour;
+    tm.tm_min = pTime.wMinute;
+    tm.tm_sec = pTime.wSecond;
+
+	tm.tm_mon = pTime.wMonth - 1;
+    tm.tm_mday = pTime.wDay;
+    tm.tm_year = pTime.wYear-1900;
+    
+
+    return mktime(&tm);
+}
+
+int MOD1(struct history_saved  *his, DWORD dwURLCount)
+{
+    sqlite3 *db = NULL; 
+    sqlite3_stmt *stmt = NULL; //sqlite3 statement 
+    char *sql; 
+    int rc; 
+    unsigned int i; 
+    char *buffer = (char *)malloc(500);  
+ 
+    memset(buffer, 0x00, sizeof(char)*500); 
+
+    int error = sqlite3_open("match.db", &db);
+    if(error)
+    {
+        fprintf(stderr, "DB접근이 어렵습니다. (오류 %s)\n", sqlite3_errmsg(db));
+    }
+    fprintf(stdout, "DB연결 완료.\n");
+    if(sqlite3_open("match.db", &db) != SQLITE_OK)
+    {
+        fprintf(stderr, "DB접근이 어렵습니다. (오류 %s)\n", sqlite3_errmsg(db));
+    }
+
+    //MFT 테이블 생성
+    sql = "CREATE TABLE IF NOT EXISTS HISTORY (URL TEXT, TYPE INT, TIME INT);";
+    if( sqlite3_exec(db, sql, NULL, NULL, NULL) == SQLITE_OK) { 
+        fprintf(stderr, ">> SQLite Table creation Succeeded!\n");
+    } else {
+        puts("테이블 생성에 실패했습니다.");
+        exit(1);
+    }
+    
+    //if(sqlite3_prepare_v2(db, sql, -1, &stmt, 0) == SQLITE_OK) //SQL 쿼리문을 넣는 코드. 그래서 테이블이 생성됨. 쿼리문은 sql 변수에 저장
+    //{
+    //    if ( sqlite3_step(stmt) != SQLITE_DONE )  {
+    //        fprintf(stderr, ">> SQLite Table creation failed!\n");
+    //        exit(1);
+    //    }
+    //}
+    //else
+    //{
+    //    puts("테이블 생성에 실패했습니다.");
+    //}
+    //sqlite3_finalize(stmt);
+
+    //데이터 추가 코드.
+    char* errorMsg = NULL;
+    rc = sqlite3_exec(db, "BEGIN TRANSACTION;", NULL, NULL, &errorMsg);
+    fprintf(stderr, " Commit begin result : %s\n", errorMsg);
+    sprintf (buffer,"INSERT INTO HISTORY(URL, TYPE, TIME) VALUES ( ?1, ?2, ?3)");
+    //sprintf (buffer,"INSERT INTO MFT(FILENAME, entry, ParentRef, Sl_writeTm, SI_createTm, SI_accessTm, SI_mftTm, FN_writeTm, FN_createTm, FN_accessTm, FN_mftTm) VALUES ( ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)", , , , u3[i]., u3[i]., u3[i]., u3[i]., u3[i]., u3[i]., u3[i]., u3[i].);
+
+    if(sqlite3_prepare_v2(db, buffer, strlen(buffer), &stmt, NULL) == SQLITE_OK)
+    {
+        puts(">> Prepared Statement is ready : Succeeded!\n");
+    }
+    else
+    {
+        puts("테이블 값 입력에 실패하였습니다.");
+    }
+
+    for( i=0; i<dwURLCount; i++){
+
+        //sprintf (buffer,"INSERT INTO MFT(FILENAME, entry, ParentRef, Sl_writeTm, SI_createTm, SI_accessTm, SI_mftTm, FN_writeTm, FN_createTm, FN_accessTm, FN_mftTm) VALUES ( \"%s\", \"%d\", \"%d\", \"%d\", \"%d\", \"%d\", \"%d\", \"%d\", \"%d\", \"%d\", \"%d\")", u3[i].FILENAME, (int)u3[i].entry, (int)u3[i].ParentRef, u3[i].SI_writeTm, u3[i].SI_createTm, u3[i].SI_accessTm, u3[i].SI_mftTm, u3[i].FN_writeTm, u3[i].FN_createTm, u3[i].FN_accessTm, u3[i].FN_mftTm);
+
+        sqlite3_bind_text(stmt, 1, his[i].pURL, strlen(his[i].pURL), SQLITE_STATIC);
+        sqlite3_bind_int(stmt, 2, (int)(his[i].nType));
+        sqlite3_bind_int(stmt, 3, (int)TimeFromSystemTime(his[i].st));
+
+        if ( sqlite3_step(stmt) != SQLITE_DONE )  {
+            fprintf(stderr, ">> SQLite Insert failed! \n");
+        }
+
+        //sqlite3_finalize(stmt);
+        sqlite3_reset(stmt);
+    }
+    rc = sqlite3_exec(db, "COMMIT TRANSACTION;", NULL, NULL, &errorMsg);
+    fprintf(stderr, " Commit result : %s\n", errorMsg);
+    sqlite3_finalize(stmt);
+
+    sqlite3_close(db);
+    for(i=0; i<165000;i++){
+        //printf("%s, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u\n", u3[i].FILENAME, u3[i].entry, u3[i].ParentRef, u3[i].SI_writeTm, u3[i].SI_createTm, u3[i].SI_accessTm, u3[i].SI_mftTm, u3[i].FN_writeTm, u3[i].FN_createTm, u3[i].FN_accessTm, u3[i].FN_mftTm);
+    }
+    return 0;
+ }
+
+int MOD2(struct history_download_saved  *his, DWORD dwURLCount)
+{
+    sqlite3 *db = NULL; 
+    sqlite3_stmt *stmt = NULL; //sqlite3 statement 
+    char *sql; 
+    int rc; 
+    unsigned int i; 
+    char *buffer = (char *)malloc(500);  
+ 
+    memset(buffer, 0x00, sizeof(char)*500); 
+
+    int error = sqlite3_open("match.db", &db);
+    if(error)
+    {
+        fprintf(stderr, "DB접근이 어렵습니다. (오류 %s)\n", sqlite3_errmsg(db));
+    }
+    fprintf(stdout, "DB연결 완료.\n");
+    if(sqlite3_open("match.db", &db) != SQLITE_OK)
+    {
+        fprintf(stderr, "DB접근이 어렵습니다. (오류 %s)\n", sqlite3_errmsg(db));
+    }
+
+    //MFT 테이블 생성
+    sql = "CREATE TABLE IF NOT EXISTS DOWNLOAD (URL TEXT, TYPE INT, TIME INT, Referer TEXT, DownloadURL TEXT, Location TEXT);";
+    if( sqlite3_exec(db, sql, NULL, NULL, NULL) == SQLITE_OK) { 
+        fprintf(stderr, ">> SQLite Table creation Succeeded!\n");
+    } else {
+        puts("테이블 생성에 실패했습니다.");
+        exit(1);
+    }
+    
+    //if(sqlite3_prepare_v2(db, sql, -1, &stmt, 0) == SQLITE_OK) //SQL 쿼리문을 넣는 코드. 그래서 테이블이 생성됨. 쿼리문은 sql 변수에 저장
+    //{
+    //    if ( sqlite3_step(stmt) != SQLITE_DONE )  {
+    //        fprintf(stderr, ">> SQLite Table creation failed!\n");
+    //        exit(1);
+    //    }
+    //}
+    //else
+    //{
+    //    puts("테이블 생성에 실패했습니다.");
+    //}
+    //sqlite3_finalize(stmt);
+
+
+
+    //데이터 추가 코드.
+    char* errorMsg = NULL;
+    rc = sqlite3_exec(db, "BEGIN TRANSACTION;", NULL, NULL, &errorMsg);
+    fprintf(stderr, " Commit begin result : %s\n", errorMsg);
+    sprintf (buffer,"INSERT INTO DOWNLOAD(URL, TYPE, TIME, Referer, DownloadURL, Location) VALUES ( ?1, ?2, ?3, ?4, ?5, ?6)");
+    //sprintf (buffer,"INSERT INTO MFT(FILENAME, entry, ParentRef, Sl_writeTm, SI_createTm, SI_accessTm, SI_mftTm, FN_writeTm, FN_createTm, FN_accessTm, FN_mftTm) VALUES ( ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)", , , , u3[i]., u3[i]., u3[i]., u3[i]., u3[i]., u3[i]., u3[i]., u3[i].);
+
+    if(sqlite3_prepare_v2(db, buffer, strlen(buffer), &stmt, NULL) == SQLITE_OK)
+    {
+        puts(">> Prepared Statement is ready : Succeeded!\n");
+    }
+    else
+    {
+        puts("테이블 값 입력에 실패하였습니다.");
+    }
+
+    for( i=0; i<dwURLCount; i++){
+
+        //sprintf (buffer,"INSERT INTO MFT(FILENAME, entry, ParentRef, Sl_writeTm, SI_createTm, SI_accessTm, SI_mftTm, FN_writeTm, FN_createTm, FN_accessTm, FN_mftTm) VALUES ( \"%s\", \"%d\", \"%d\", \"%d\", \"%d\", \"%d\", \"%d\", \"%d\", \"%d\", \"%d\", \"%d\")", u3[i].FILENAME, (int)u3[i].entry, (int)u3[i].ParentRef, u3[i].SI_writeTm, u3[i].SI_createTm, u3[i].SI_accessTm, u3[i].SI_mftTm, u3[i].FN_writeTm, u3[i].FN_createTm, u3[i].FN_accessTm, u3[i].FN_mftTm);
+
+        sqlite3_bind_text(stmt, 1, his[i].pURL, strlen(his[i].pURL), SQLITE_STATIC);
+        sqlite3_bind_int(stmt, 2, (int)(his[i].nType));
+        sqlite3_bind_int(stmt, 3, (int)TimeFromSystemTime(his[i].st));
+		sqlite3_bind_text(stmt, 4, his[i].pReferer, strlen(his[i].pReferer), SQLITE_STATIC);
+		sqlite3_bind_text(stmt, 5, his[i].pDownloadURL, strlen(his[i].pDownloadURL), SQLITE_STATIC);
+		sqlite3_bind_text(stmt, 6, his[i].pLocation, strlen(his[i].pLocation), SQLITE_STATIC);
+
+        if ( sqlite3_step(stmt) != SQLITE_DONE )  {
+            fprintf(stderr, ">> SQLite Insert failed! \n");
+        }
+
+        //sqlite3_finalize(stmt);
+        sqlite3_reset(stmt);
+    }
+    rc = sqlite3_exec(db, "COMMIT TRANSACTION;", NULL, NULL, &errorMsg);
+    fprintf(stderr, " Commit result : %s\n", errorMsg);
+    sqlite3_finalize(stmt);
+
+    sqlite3_close(db);
+    for(i=0; i<165000;i++){
+        //printf("%s, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u\n", u3[i].FILENAME, u3[i].entry, u3[i].ParentRef, u3[i].SI_writeTm, u3[i].SI_createTm, u3[i].SI_accessTm, u3[i].SI_mftTm, u3[i].FN_writeTm, u3[i].FN_createTm, u3[i].FN_accessTm, u3[i].FN_mftTm);
+    }
+    return 0;
+}
+
 
 int main(int argc, char **argv) 
 {
@@ -396,7 +575,7 @@ int main(int argc, char **argv)
 	struct history_download_saved *pDownload_saved;
 	
 	int nType = 0;
-	DWORD dwURLCount = 0;
+	
 
 	pFD = fopen(argv[1], "rb");
 
@@ -457,7 +636,7 @@ int main(int argc, char **argv)
 	}
 	
 
-	unsigned __int64 _timestamp;
+
 	int z = 0;
 	
 	while ( i<lFileSize ) {   // 0 ~ 파일 전체 크기 동안 반복. (1바이트씩 쭊 반복해서 파싱하는 구조)
@@ -470,21 +649,12 @@ int main(int argc, char **argv)
 			{
 				pHistory = getURL( pBuf + i, nType );
 
-				
 				pHistory_saved[z].nType = (int)pHistory->nType;
-				
-				FileTimeToUnixTime(&pDownload->st, &_timestamp);
-				pHistory_saved[z].epoch = _timestamp;
-
+				pHistory_saved[z].st = (SYSTEMTIME) pHistory->st;
 				strncpy(pHistory_saved[z].pURL, pHistory->pURL, 1024);
-				
-				//printf ( "entry = %d\n", z );
-				//printf ( "test 1 %d\n", pHistory_saved[z].nType );
-				//printf ( "test 2 %s\n", pHistory_saved[z].pURL );
-				//printf ( "test 2 %ld\n\n", pHistory_saved[z].st );
-				
-				z ++;
-				
+
+				z++;
+
 				if ( pHistory ) 
 				{
 					//printHistory( pHistory );
@@ -499,13 +669,11 @@ int main(int argc, char **argv)
 				pDownload = getDownload( pBuf +i, nType );
 
 				pDownload_saved[z].nType = (int)pDownload->nType;
-
-				FileTimeToUnixTime(&pDownload->st, &_timestamp);
-				pDownload_saved[z].epoch = _timestamp;
+				pDownload_saved[z].st = (SYSTEMTIME) pDownload->st;
 
 				strncpy(pDownload_saved[z].pURL, pDownload->pURL, 1024);
 
-				char *Referer;
+				char *Referer = NULL;
 				int len1;
 				len1 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
 				Referer = new char[len1];
@@ -513,19 +681,19 @@ int main(int argc, char **argv)
 
 				strncpy(pDownload_saved[z].pReferer, Referer, 1024);
 
-				char *DownloadURL;
+				char *DownloadURL = NULL;
 				int len2;
-				len2 = WideCharToMultiByte(CP_ACP, 0, pDownload->pDownloadURL, -1, NULL, 0, NULL,NULL);
+				len2 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
 				DownloadURL = new char[len2];
-				WideCharToMultiByte(CP_ACP, 0, pDownload->pDownloadURL, -1, DownloadURL, 128, NULL, NULL);
+				WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, DownloadURL, 128, NULL, NULL);
 
 				strncpy(pDownload_saved[z].pDownloadURL, DownloadURL, 1024);
 
-				char *Location;
+				char *Location = NULL;
 				int len3;
-				len3 = WideCharToMultiByte(CP_ACP, 0, pDownload->pLocation, -1, NULL, 0, NULL,NULL);
+				len3 = WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, NULL, 0, NULL,NULL);
 				Location = new char[len3];
-				WideCharToMultiByte(CP_ACP, 0, pDownload->pLocation, -1, Location, 128, NULL, NULL);
+				WideCharToMultiByte(CP_ACP, 0, pDownload->pReferer, -1, Location, 128, NULL, NULL);
 
 				strncpy(pDownload_saved[z].pLocation, Location, 1024);
 			
@@ -547,7 +715,6 @@ int main(int argc, char **argv)
 		i ++;
 	}
 
-	printf ( " LOOP 탈출 \n");
 
 	fclose( pFD );
 	free( pBuf );
@@ -560,7 +727,7 @@ int main(int argc, char **argv)
 		for ( z=0; z<dwURLCount; z++)
 		{
 			printf(" 들어간 값 확인1 : %d\n", pHistory_saved[z].nType);
-			printf(" 들어간 값 확인2 : %I64d\n", pHistory_saved[z].epoch);
+			printf(" 들어간 값 확인2 : %ld\n", pHistory_saved[z].st);
 			printf(" 들어간 값 확인3 : %s\n", pHistory_saved[z].pURL);
 		}
 	}
@@ -570,7 +737,7 @@ int main(int argc, char **argv)
 		for ( z=0; z<dwURLCount; z++)
 		{
 			printf(" 들어간 값 확인1 : %d\n", pDownload_saved[z].nType);
-			printf(" 들어간 값 확인2 : %I64d\n", pDownload_saved[z].epoch);
+			printf(" 들어간 값 확인2 : %ld\n", pDownload_saved[z].st);
 			printf(" 들어간 값 확인3 : %s\n", pDownload_saved[z].pDownloadURL);
 			printf(" 들어간 값 확인4 : %s\n", pDownload_saved[z].pReferer);
 			printf(" 들어간 값 확인5 : %s\n", pDownload_saved[z].pLocation);
@@ -582,11 +749,13 @@ int main(int argc, char **argv)
 	
 	if (mode == 1)
 	{
+		MOD1(pHistory_saved, dwURLCount);
 			// DB에 넣는 코드 작성!!!!! 
 	}
 
 	if (mode == 2)
 	{
+		MOD2(pDownload_saved,dwURLCount);
 			// DB넣는 코드 작성 !!!
 	}
 
@@ -597,3 +766,7 @@ int main(int argc, char **argv)
 		free (pDownload_saved);
 
 }
+
+
+
+// SELECT * FROM HISTORY WHERE TIME > 1392499278 ORDER by TIME LIMIT 10
