@@ -1,37 +1,37 @@
-﻿빌드 시작: 2014-02-20 오전 12:50:22
+﻿빌드 시작: 2014-02-20 오후 3:12:34
      1>2 노드의 "C:\Users\cjy\Desktop\IE_index_dat_parser\iehist.vcxproj" 프로젝트(Build 대상)입니다.
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /IC:\Users\cjy\Desktop\MFTParser\sqlite /IC:\Users\KMS\Desktop\Projects\sqlite /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _VC80_UPGRADE=0x0600 /D _MBCS /Gm /EHsc /RTC1 /MD /GS /Gy- /fp:precise /Zc:wchar_t /Zc:forScope /Fo".\Debug\\" /Fd".\Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt iehist.cpp
          iehist.cpp
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(150): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(152): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 11.0\vc\include\string.h(191) : 'strncpy' 선언을 참조하십시오.
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(104): warning C4101: 'a' :참조되지 않은 지역 변수입니다.
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(303): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(106): warning C4101: 'a' :참조되지 않은 지역 변수입니다.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(305): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 11.0\vc\include\string.h(191) : 'strncpy' 선언을 참조하십시오.
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(314): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(316): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 11.0\vc\include\string.h(110) : 'strcpy' 선언을 참조하십시오.
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(317): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(319): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 11.0\vc\include\string.h(110) : 'strcpy' 선언을 참조하십시오.
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(342): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(344): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 11.0\vc\include\string.h(110) : 'strcpy' 선언을 참조하십시오.
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(345): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(347): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 11.0\vc\include\string.h(110) : 'strcpy' 선언을 참조하십시오.
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(365): warning C4101: 't' :참조되지 않은 지역 변수입니다.
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(429): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(367): warning C4101: 't' :참조되지 않은 지역 변수입니다.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(431): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 11.0\vc\include\stdio.h(357) : 'sprintf' 선언을 참조하십시오.
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(517): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(519): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 11.0\vc\include\stdio.h(357) : 'sprintf' 선언을 참조하십시오.
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(580): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(582): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 11.0\vc\include\stdio.h(218) : 'fopen' 선언을 참조하십시오.
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(654): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(656): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 11.0\vc\include\string.h(191) : 'strncpy' 선언을 참조하십시오.
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(674): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(676): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 11.0\vc\include\string.h(191) : 'strncpy' 선언을 참조하십시오.
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(682): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(684): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 11.0\vc\include\string.h(191) : 'strncpy' 선언을 참조하십시오.
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(690): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(692): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 11.0\vc\include\string.h(191) : 'strncpy' 선언을 참조하십시오.
-     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(698): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>c:\users\cjy\desktop\ie_index_dat_parser\iehist.cpp(700): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  c:\program files (x86)\microsoft visual studio 11.0\vc\include\string.h(191) : 'strncpy' 선언을 참조하십시오.
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:".\Debug\iehist.exe" /INCREMENTAL /NOLOGO /LIBPATH:C:\Users\cjy\Desktop\MFTParser\sqlite\Debug odbc32.lib odbccp32.lib sqlite3d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:".\Debug\iehist.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\Debug\iehist.lib" /MACHINE:X86 /SAFESEH .\Debug\iehist.obj
@@ -40,4 +40,4 @@
 
 빌드했습니다.
 
-경과 시간: 00:00:01.79
+경과 시간: 00:00:01.74
